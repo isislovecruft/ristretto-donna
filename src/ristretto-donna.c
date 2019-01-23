@@ -13,7 +13,7 @@
 #ifdef DEBUGGING
 #define PRINT(x) printf x; printf("\n")
 #else
-#define PRINT(x) do {} while 0
+#define PRINT(x) do {} while (0)
 #endif
 
 static uint8_t uchar_ct_eq(const uint8_t a, const uint8_t b);
