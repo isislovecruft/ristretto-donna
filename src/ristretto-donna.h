@@ -66,6 +66,21 @@ const bignum25519 one = {1, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 const bignum25519 negative_one = {-1, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 #endif
 
+#if defined(ED25519_64BIT)
+const bignum25519 INVSQRT_A_MINUS_D = {
+  278908739862762,
+  821645201101625,
+  8113234426968,
+  1777959178193151,
+  2118520810568447,
+};
+#else
+const bignum25519 INVSQRT_A_MINUS_D = {
+  6111466,  4156064, 39310137, 12243467, 41204824,
+  120896, 20826367, 26493656,  6093567, 31568420,
+};
+#endif
+
 /**
  * The Ristretto basepoint in compressed form.
  */

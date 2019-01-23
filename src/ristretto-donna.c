@@ -221,6 +221,12 @@ int ristretto_decode(ristretto_point_t *element, const unsigned char bytes[32])
 void ristretto_encode(unsigned char bytes[32], const ristretto_point_t *element)
 {
   bignum25519 u1, u2, i1, i2, z_inv, den_inv, ix, iy, invsqrt, tmp1, tmp2;
+  bignum25519 x, y, y_neg, s, s_neg;
+  bignum25519 enchanted_denominator;
+  unsigned char contracted[32];
+  uint8_t x_zinv_is_negative;
+  uint8_t s_is_negative;
+  uint8_t rotate;
 
   curve25519_add_reduce(tmp1, element->point.z, element->point.y);
   curve25519_sub_reduce(tmp2, element->point.z, element->point.y);
@@ -236,9 +242,47 @@ void ristretto_encode(unsigned char bytes[32], const ristretto_point_t *element)
   curve25519_mul(i2, invsqrt, u2);
   curve25519_mul(tmp1, i2, element->point.t);
   curve25519_mul(z_inv, tmp1, i1);
+  curve25519_mul(ix, element->point.x, SQRT_M1);
+  curve25519_mul(iy, element->point.y, SQRT_M1);
+  curve25519_mul(enchanted_denominator, i1, INVSQRT_A_MINUS_D);
+  curve25519_mul(tmp1, element->point.t, z_inv);
+  curve25519_contract(contracted, tmp1);
 
+  rotate = bignum25519_is_negative(contracted);
 
+  curve25519_copy(x, element->point.x);
+  curve25519_copy(y, element->point.y);
+
+  // Rotate into the distinguished Jacobi quartic quadrant
+  curve25519_swap_conditional(x, iy, rotate);
+  curve25519_swap_conditional(y, ix, rotate);
+  curve25519_swap_conditional(i2, enchanted_denominator, rotate);
+
+  // Next we torque the points to be non-negative
+
+  // Conditionally flip the sign of y to be positive
+  curve25519_mul(tmp1, element->point.x, z_inv);
+  curve25519_contract(contracted, tmp1);
+
+  x_zinv_is_negative = bignum25519_is_negative(contracted);
+
+  curve25519_neg(y_neg, y);
+  curve25519_swap_conditional(y, y_neg, x_zinv_is_negative);
+
+  curve25519_sub_reduce(tmp1, element->point.z, element->point.y);
+  curve25519_mul(s, i2, tmp1);
+  curve25519_contract(contracted, s);
+
+  // Conditionally flip the sign of s to be positive
+  s_is_negative = bignum25519_is_negative(contracted);
+
+  curve25519_neg(s_neg, s);
+  curve25519_swap_conditional(s, s_neg, s_is_negative);
+
+  // Output the compressed form of s
+  curve25519_contract(bytes, s);
 }
+
 
 int ristretto_from_uniform_bytes(ristretto_point_t *element, unsigned char bytes[64])
 {
