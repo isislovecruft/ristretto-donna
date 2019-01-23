@@ -219,9 +219,26 @@ int ristretto_decode(ristretto_point_t *element, unsigned char bytes[32])
   return 1;
 }
 
-int ristretto_encode(unsigned char bytes[32], ristretto_point_t *element)
+void ristretto_encode(unsigned char bytes[32], const ristretto_point_t *element)
 {
-  return 1;
+  bignum25519 u1, u2, i1, i2, z_inv, den_inv, ix, iy, invsqrt, tmp1, tmp2;
+
+  curve25519_add_reduce(tmp1, element->point.z, element->point.y);
+  curve25519_sub_reduce(tmp2, element->point.z, element->point.y);
+  curve25519_mul(u1, tmp1, tmp2);
+  curve25519_mul(u2, element->point.x, element->point.y);
+
+  curve25519_mul(tmp1, u1, u2);
+
+  // This is always square so we don't need to check the return value
+  curve25519_invsqrt(invsqrt, tmp1);
+
+  curve25519_mul(i1, invsqrt, u1);
+  curve25519_mul(i2, invsqrt, u2);
+  curve25519_mul(tmp1, i2, element->point.t);
+  curve25519_mul(z_inv, tmp1, i1);
+
+
 }
 
 int ristretto_from_uniform_bytes(ristretto_point_t *element, unsigned char bytes[64])

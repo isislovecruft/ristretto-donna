@@ -77,7 +77,7 @@ static unsigned char RISTRETTO_BASEPOINT_COMPRESSED[32] = {
 };
 
 int ristretto_decode(ristretto_point_t *element, unsigned char bytes[32]);
-int ristretto_encode(unsigned char bytes[32], ristretto_point_t *element);
+void ristretto_encode(unsigned char bytes[32], const ristretto_point_t *element);
 int ristretto_from_uniform_bytes(ristretto_point_t *element, unsigned char bytes[64]);
 int ristretto_ct_eq(ristretto_point_t a, ristretto_point_t b);
 
