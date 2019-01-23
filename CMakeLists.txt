@@ -19,7 +19,8 @@ add_subdirectory(src)
 # so that we will find ristretto-donna-config.h
 include_directories("${PROJECT_BINARY_DIR}")
 
-set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -march=native -O3 -DEDD25519_TEST -DDEBUGGING")
+set(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} -DEDD25519_TEST -DDEBUGGING")
+set(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE} -march=native -O3 -DEDD25519_TEST")
 
 # add the executable
 add_executable(ristretto-donna
