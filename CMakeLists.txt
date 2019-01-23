@@ -19,12 +19,12 @@ add_subdirectory(src)
 # so that we will find ristretto-donna-config.h
 include_directories("${PROJECT_BINARY_DIR}")
 
-set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -march=native -O3 -DEDD25519_TEST")
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -march=native -O3 -DEDD25519_TEST -DDEBUGGING")
 
 # add the executable
 add_executable(ristretto-donna
-  src/ed25519.c
-  src/test.c
+  src/ristretto-donna.c
+  src/test-ristretto.c
 )
 
 # Link in OpenSSL
