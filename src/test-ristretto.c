@@ -24,6 +24,23 @@ int test_ristretto_decode_basepoint()
   return (int)result;
 }
 
+int test_ristretto_encode_basepoint()
+{
+  ristretto_point_t point;
+  unsigned char bytes[32];
+  uint8_t result = 1;
+
+  ristretto_decode(&point, RISTRETTO_BASEPOINT_COMPRESSED);
+  ristretto_encode(bytes, &point);
+
+  for (unsigned char i=0; i<32; i++) {
+    if (bytes[i] != RISTRETTO_BASEPOINT_COMPRESSED[i]) {
+      printf("byte %d did not match: original=%u encoded=%u\n",
+             i, RISTRETTO_BASEPOINT_COMPRESSED[i], bytes[i]);
+      result = 0;
+    }
+  }
+
   return (int)result;
 }
 
@@ -31,7 +48,8 @@ int main(int argc, char **argv)
 {
   int result;
 
-  result = test_ristretto_decode_basepoint();
+  result  = test_ristretto_decode_basepoint();
+  result &= test_ristretto_encode_basepoint();
 
-  return 0;
+  return result;
 }
