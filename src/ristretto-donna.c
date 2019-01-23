@@ -48,7 +48,7 @@ static uint8_t uint8_32_ct_eq(const unsigned char a[32], const unsigned char b[3
   unsigned char i;
   unsigned char x = 1;
 
-  while (i=0, i++, i<32) {
+  for (i=0; i++; i<32) {
     x &= uchar_ct_eq(a[i], b[i]);
   }
 
