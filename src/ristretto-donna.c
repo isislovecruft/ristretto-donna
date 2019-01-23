@@ -11,7 +11,7 @@
 #include "ristretto-donna.h"
 
 #ifdef DEBUGGING
-#define PRINT(x) printf x
+#define PRINT(x) printf x; printf("\n")
 #else
 #define PRINT(x) do {} while 0
 #endif
