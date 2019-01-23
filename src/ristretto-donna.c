@@ -131,7 +131,7 @@ static uint8_t curve25519_invsqrt(bignum25519 out, bignum25519 v)
  *
  * Returns 0 if the point could not be decoded and 1 otherwise.
  */
-int ristretto_decode(ristretto_point_t *element, unsigned char bytes[32])
+int ristretto_decode(ristretto_point_t *element, const unsigned char bytes[32])
 {
   bignum25519 s, ss;
   bignum25519 u1, u1_sqr, u2, u2_sqr;
