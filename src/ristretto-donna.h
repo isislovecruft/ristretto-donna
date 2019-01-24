@@ -9,6 +9,7 @@
 #define RISTRETTO_DONNA_H
 
 #include "ed25519-donna.h"
+#include "ristretto-utils.h"
 
 #if defined(__cplusplus)
 extern "C" {

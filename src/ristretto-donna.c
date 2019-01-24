@@ -10,12 +10,6 @@
 
 #include "ristretto-donna.h"
 
-#ifdef DEBUGGING
-#define PRINT(x) printf x; printf("\n")
-#else
-#define PRINT(x) do {} while (0)
-#endif
-
 static uint8_t uchar_ct_eq(const uint8_t a, const uint8_t b);
 static uint8_t uint8_32_ct_eq(const unsigned char a[32], const unsigned char b[32]);
 static uint8_t bignum25519_ct_eq(const bignum25519 a, const bignum25519 b);
