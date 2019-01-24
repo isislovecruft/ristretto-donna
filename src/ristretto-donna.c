@@ -20,7 +20,6 @@ static uint8_t uchar_ct_eq(const uint8_t a, const uint8_t b);
 static uint8_t uint8_32_ct_eq(const unsigned char a[32], const unsigned char b[32]);
 static uint8_t bignum25519_ct_eq(const bignum25519 a, const bignum25519 b);
 static uint8_t bignum25519_is_negative(unsigned char bytes[32]);
-static uint8_t curve25519_invsqrt(bignum25519 out, bignum25519 v);
 
 /**
  * Check if two bytes are equal in constant time.
@@ -88,7 +87,7 @@ static uint8_t bignum25519_is_negative(unsigned char bytes[32])
  *  - 0 and stores `0` in `out` if `v` was zero,
  *  - 0 and stores `+sqrt(i/v)` in `out` if `v` was a non-zero non-square.
  */
-static uint8_t curve25519_invsqrt(bignum25519 out, bignum25519 v)
+STATIC uint8_t curve25519_invsqrt(bignum25519 *out, bignum25519 *v)
 {
   bignum25519 tmp, v3, v7, r, r_prime, r_negative, check, i;
   unsigned char r_bytes[32];
@@ -99,14 +98,14 @@ static uint8_t curve25519_invsqrt(bignum25519 out, bignum25519 v)
 
   PRINT(("in invsqrt"));
 
-  curve25519_square(tmp, v);       // v²
-  curve25519_mul(v3, tmp, v);      // v³
+  curve25519_square(tmp, *v);      // v²
+  curve25519_mul(v3, tmp, *v);     // v³
   curve25519_square(tmp, v3);      // v⁶
-  curve25519_mul(v7, tmp, v);      // v⁷
+  curve25519_mul(v7, tmp, *v);     // v⁷
   curve25519_mul(tmp, v3, v7);     // v²¹
   curve25519_pow_two252m3(r, tmp); // v^{2^252+18}
   curve25519_square(tmp, r);       // v^{2^252+19}
-  curve25519_mul(check, v, tmp);
+  curve25519_mul(check, *v, tmp);
   curve25519_neg(i, SQRT_M1);      // -sqrt(-1)
   
   correct_sign_sqrt = bignum25519_ct_eq(check, one);
@@ -175,7 +174,7 @@ int ristretto_decode(ristretto_point_t *element, const unsigned char bytes[32])
   curve25519_sub_reduce(v, tmp, u2_sqr); // ad(1+as²)² - (1-as²)²
   curve25519_mul(tmp, v, u2_sqr);        // v = (ad(1+as²)² - (1-as²)²)(1-as²)²
 
-  ok = curve25519_invsqrt(i, tmp);       // i = 1/sqrt{(ad(1+as²)² - (1-as²)²)(1-as²)²}
+  ok = curve25519_invsqrt(&i, &tmp);     // i = 1/sqrt{(ad(1+as²)² - (1-as²)²)(1-as²)²}
 
   PRINT(("step 3"));
 
@@ -236,7 +235,7 @@ void ristretto_encode(unsigned char bytes[32], const ristretto_point_t *element)
   curve25519_mul(tmp1, u1, u2);
 
   // This is always square so we don't need to check the return value
-  curve25519_invsqrt(invsqrt, tmp1);
+  curve25519_invsqrt(&invsqrt, &tmp1);
 
   curve25519_mul(i1, invsqrt, u1);
   curve25519_mul(i2, invsqrt, u2);
