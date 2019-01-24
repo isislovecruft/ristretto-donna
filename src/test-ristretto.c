@@ -44,12 +44,26 @@ int test_ristretto_encode_basepoint()
   return (int)result;
 }
 
+int test_ristretto_ct_eq()
+{
+  ristretto_point_t *a, *b;
+  int result;
+
+  ristretto_decode(a, RISTRETTO_BASEPOINT_COMPRESSED);
+  ristretto_decode(b, RISTRETTO_BASEPOINT_COMPRESSED);
+
+  result = ristretto_ct_eq(a, b);
+
+  return result;
+}
+
 int main(int argc, char **argv)
 {
   int result;
 
   result  = test_ristretto_decode_basepoint();
   result &= test_ristretto_encode_basepoint();
+  result &= test_ristretto_ct_eq();
 
   return result;
 }

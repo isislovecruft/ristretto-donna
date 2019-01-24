@@ -284,7 +284,18 @@ int ristretto_from_uniform_bytes(ristretto_point_t *element, unsigned char bytes
   return 1;
 }
 
-int ristretto_ct_eq(ristretto_point_t a, ristretto_point_t b)
+int ristretto_ct_eq(const ristretto_point_t *a, const ristretto_point_t *b)
 {
-  return 1;
+  bignum25519 x1y2, y1x2, x1x2, y1y2;
+  uint8_t check_one, check_two;
+
+  curve25519_mul(x1y2, a->point.x, b->point.y);
+  curve25519_mul(y1x2, a->point.y, b->point.x);
+  curve25519_mul(x1x2, a->point.x, b->point.x);
+  curve25519_mul(y1y2, a->point.y, b->point.y);
+
+  check_one = bignum25519_ct_eq(x1y2, y1x2);
+  check_two = bignum25519_ct_eq(x1x2, y1y2);
+
+  return check_one | check_two;
 }
