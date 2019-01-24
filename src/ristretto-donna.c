@@ -5,6 +5,8 @@
 // Authors:
 // - isis agora lovecruft <isis@patternsinthevoid.net>
 
+#define RISTRETTO_DONNA_PRIVATE
+
 #include <stdint.h>
 #include <stdio.h>
 

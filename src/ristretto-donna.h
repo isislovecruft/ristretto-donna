@@ -92,14 +92,14 @@ static unsigned char RISTRETTO_BASEPOINT_COMPRESSED[32] = {
     0xb6, 0xa6, 0x59, 0x45, 0xe0, 0x8d, 0x2d, 0x76,
 };
 
-#ifdef ED25519_TEST
-STATIC uint8_t curve25519_invsqrt(bignum25519 *out, bignum25519 *v);
-#endif
-
 int ristretto_decode(ristretto_point_t *element, const unsigned char bytes[32]);
 void ristretto_encode(unsigned char bytes[32], const ristretto_point_t *element);
 int ristretto_from_uniform_bytes(ristretto_point_t *element, unsigned char bytes[64]);
 int ristretto_ct_eq(ristretto_point_t a, ristretto_point_t b);
+
+#ifdef RISTRETTO_DONNA_PRIVATE
+STATIC uint8_t curve25519_invsqrt(bignum25519 *out, bignum25519 *v);
+#endif // RISTRETTO_DONNA_PRIVATE
 
 #if defined(__cplusplus)
 }
