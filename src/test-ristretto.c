@@ -52,7 +52,7 @@ int test_curve25519_expand_random_field_element()
   curve25519_expand(a, A_BYTES);
 
   printf("a=");
-  fe_print(&a);
+  fe_print(a);
 
   return 1;
 }
@@ -66,7 +66,7 @@ int test_invsqrt_random_field_element()
 
   //curve25519_expand(v, ASQ_BYTES);
   curve25519_copy(v, one);
-  result = curve25519_invsqrt(&v_invsqrt, &v);
+  result = curve25519_invsqrt(v_invsqrt, v);
 
   PRINT(("invsqrt test: "));
   if (result == 1) {

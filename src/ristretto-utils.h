@@ -41,16 +41,16 @@ extern "C" {
 #define EXTERN(type, name)
 #endif /* defined(ED25519_TEST) */
 
-void fe_print(bignum25519 *fe);
-void fe_print(bignum25519 *fe)
+void fe_print(const bignum25519 fe);
+void fe_print(const bignum25519 fe)
 {
 #ifdef ED25519_64BIT
   printf("{%lu, %lu, %lu, %lu, %lu}\n",
-         *fe[0], *fe[1], *fe[2], *fe[3], *fe[4]);
+         fe[0], fe[1], fe[2], fe[3], fe[4]);
 #else
   printf("{%lu, %lu, %lu, %lu, %lu, %lu, %lu, %lu, %lu, %lu}\n",
-         *fe[0], *fe[1], *fe[2], *fe[3], *fe[4],
-         *fe[5], *fe[6], *fe[7], *fe[8], *fe[9]);
+         fe[0], fe[1], fe[2], fe[3], fe[4],
+         fe[5], fe[6], fe[7], fe[8], fe[9]);
 #endif
 }
 

@@ -74,7 +74,7 @@ static uint8_t bignum25519_is_negative(unsigned char bytes[32])
   return bytes[0] & 1;
 }
 
-uint8_t curve25519_sqrt_ratio_i(bignum25519 *out, const bignum25519 *u, const bignum25519 *v)
+uint8_t curve25519_sqrt_ratio_i(bignum25519 out, const bignum25519 u, const bignum25519 v)
 {
   bignum25519 tmp, v3, v7, r, r_prime, r_negative, check, i, u_neg, u_neg_i;
   unsigned char r_bytes[32];
@@ -87,26 +87,26 @@ uint8_t curve25519_sqrt_ratio_i(bignum25519 *out, const bignum25519 *u, const bi
   fe_print(u);
   fe_print(v);
 
-  curve25519_square(tmp, *v);      // v²
-  curve25519_mul(v3, tmp, *v);     // v³
+  curve25519_square(tmp, v);      // v²
+  curve25519_mul(v3, tmp, v);     // v³
   curve25519_square(tmp, v3);      // v⁶
-  curve25519_mul(v7, tmp, *v);     // v⁷
-  curve25519_mul(tmp, *u, v7);     // u*v^7
+  curve25519_mul(v7, tmp, v);     // v⁷
+  curve25519_mul(tmp, u, v7);     // u*v^7
   curve25519_pow_two252m3(r, tmp); // (u*v^7)^{(p-5)/8}
-  curve25519_mul(r, r, *u);        // (u)*(u*v^7)^{(p-5)/8}
+  curve25519_mul(r, r, u);        // (u)*(u*v^7)^{(p-5)/8}
   curve25519_mul(r, r, v3);        // (u)*(u*v^7)^{(p-5)/8}
   curve25519_square(tmp, r);       // tmp = r^2
-  curve25519_mul(check, *v, tmp);  // check = r^2 * v
+  curve25519_mul(check, v, tmp);  // check = r^2 * v
 
   printf("r = \n");
   fe_print(r);
   printf("check = \n");
   fe_print(check);
   
-  curve25519_neg(u_neg, *u);
+  curve25519_neg(u_neg, u);
   curve25519_mul(u_neg_i, u_neg, SQRT_M1);
 
-  correct_sign_sqrt = bignum25519_ct_eq(check, *u);
+  correct_sign_sqrt = bignum25519_ct_eq(check, u);
   flipped_sign_sqrt = bignum25519_ct_eq(check, u_neg);
   flipped_sign_sqrt_i = bignum25519_ct_eq(check, u_neg_i);
 
@@ -135,9 +135,9 @@ uint8_t curve25519_sqrt_ratio_i(bignum25519 *out, const bignum25519 *u, const bi
  *  - 0 and stores `0` in `out` if `v` was zero,
  *  - 0 and stores `+sqrt(i/v)` in `out` if `v` was a non-zero non-square.
  */
-uint8_t curve25519_invsqrt(bignum25519 *out, const bignum25519 *v)
+uint8_t curve25519_invsqrt(bignum25519 out, const bignum25519 v)
 {
-  return curve25519_sqrt_ratio_i(out, &one, v);
+  return curve25519_sqrt_ratio_i(out, one, v);
 }
 
 /**
@@ -189,7 +189,7 @@ int ristretto_decode(ristretto_point_t *element, const unsigned char bytes[32])
   curve25519_sub_reduce(v, tmp, u2_sqr); // ad(1+as²)² - (1-as²)²
   curve25519_mul(tmp, v, u2_sqr);        // v = (ad(1+as²)² - (1-as²)²)(1-as²)²
 
-  ok = curve25519_invsqrt(&i, &tmp);     // i = 1/sqrt{(ad(1+as²)² - (1-as²)²)(1-as²)²}
+  ok = curve25519_invsqrt(i, tmp);       // i = 1/sqrt{(ad(1+as²)² - (1-as²)²)(1-as²)²}
 
   PRINT(("step 3"));
 
@@ -250,7 +250,7 @@ void ristretto_encode(unsigned char bytes[32], const ristretto_point_t *element)
   curve25519_mul(tmp1, u1, u2);
 
   // This is always square so we don't need to check the return value
-  curve25519_invsqrt(&invsqrt, &tmp1);
+  curve25519_invsqrt(invsqrt, tmp1);
 
   curve25519_mul(i1, invsqrt, u1);
   curve25519_mul(i2, invsqrt, u2);
