@@ -121,7 +121,7 @@ uint8_t curve25519_sqrt_ratio_i(bignum25519 *out, const bignum25519 *u, const bi
  *  - 0 and stores `0` in `out` if `v` was zero,
  *  - 0 and stores `+sqrt(i/v)` in `out` if `v` was a non-zero non-square.
  */
-uint8_t curve25519_invsqrt(bignum25519 *out, bignum25519 *v)
+uint8_t curve25519_invsqrt(bignum25519 *out, const bignum25519 *v)
 {
   return curve25519_sqrt_ratio_i(out, &one, v);
 }
