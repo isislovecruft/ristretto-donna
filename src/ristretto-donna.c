@@ -288,8 +288,7 @@ void ristretto_encode(unsigned char bytes[32], const ristretto_point_t *element)
   curve25519_contract(bytes, s);
 }
 
-
-int ristretto_from_uniform_bytes(ristretto_point_t *element, unsigned char bytes[64])
+int ristretto_from_uniform_bytes(ristretto_point_t *element, const unsigned char bytes[64])
 {
   return 1;
 }
