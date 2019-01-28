@@ -59,29 +59,48 @@ int test_curve25519_expand_random_field_element()
 
 int test_invsqrt_random_field_element()
 {
-  bignum25519 a, a_inv;
+  bignum25519 check, a, a_invsqrt;
   uint8_t result;
 
-  curve25519_expand(a, A_BYTES);
-  result = curve25519_invsqrt(&a_inv, &a);
+  // Use a = decode(ASQ_BYTES) so it's guaranteed to be square
 
-  printf("invsqrt random field element: ");
-  if (result != 1) {
-#ifdef ED25519_64BIT
-    printf("FAIL result=%d a_inv={%lu, %lu, %lu, %lu, %lu}\n",
-           result,
-           a_inv[0], a_inv[1], a_inv[2], a_inv[3], a_inv[4]);
-#else
-    printf("FAIL result=%d a_inv={%lu, %lu, %lu, %lu, %lu, %lu, %lu, %lu, %lu, %lu}\n",
-           result,
-           a_inv[0], a_inv[1], a_inv[2], a_inv[3], a_inv[4],
-           a_inv[5], a_inv[6], a_inv[7], a_inv[8], a_inv[9]);
-#endif
+  curve25519_expand(a, ASQ_BYTES);
+  result = curve25519_invsqrt(&a_invsqrt, &a);
+
+  PRINT(("invsqrt random field element: "));
+  if (result == 1) {
+    // expect a_invsqrt = sqrt(1/a)
+    // check = 1/a
+    curve25519_square(check, a_invsqrt);
+    // check = 1
+    curve25519_mul(check, check, a);
+    // assert check == 1
+    if (bignum25519_ct_eq(check, one) == 1) {
+      PRINT(("OKAY invsqrt computed correctly with tweak=1"));
+      return 1;
+    } else {
+      PRINT(("FAIL invsqrt not computed correctly with tweak=1"));
+      return 0;
+    }
+  } else if (result == 0) {
+    // expect a_invsqrt = sqrt(i/a)
+    // check = i/a
+    curve25519_square(check, a_invsqrt);
+    // check = i
+    curve25519_mul(check, check, a);
+    // assert check == i
+    if (bignum25519_ct_eq(check, SQRT_M1) == 1) {
+      PRINT(("OKAY invsqrt computed correctly with tweak=i"));
+      return 1;
+    } else {
+      PRINT(("FAIL invsqrt not computed correctly with tweak=i"));
+      return 0;
+    }
   } else {
-    printf("OKAY");
+    PRINT(("FAIL invsqrt did not return 0 or 1"));
+    return 0;
   }
 
-  return (int)result;
 }
 
 int test_ristretto_decode_random_point()

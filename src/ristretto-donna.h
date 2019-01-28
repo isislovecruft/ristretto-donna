@@ -99,6 +99,7 @@ int ristretto_ct_eq(const ristretto_point_t *a, const ristretto_point_t *b);
 
 #ifdef RISTRETTO_DONNA_PRIVATE
 uint8_t curve25519_invsqrt(bignum25519 *out, bignum25519 *v);
+uint8_t bignum25519_ct_eq(const bignum25519 a, const bignum25519 b);
 #endif // RISTRETTO_DONNA_PRIVATE
 
 #if defined(__cplusplus)
