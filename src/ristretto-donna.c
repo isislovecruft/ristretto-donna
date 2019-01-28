@@ -110,9 +110,9 @@ uint8_t curve25519_sqrt_ratio_i(bignum25519 out, const bignum25519 u, const bign
   flipped_sign_sqrt = bignum25519_ct_eq(check, u_neg);
   flipped_sign_sqrt_i = bignum25519_ct_eq(check, u_neg_i);
 
-  printf("correct_sign_sqrt = %d", correct_sign_sqrt);
-  printf("flipped_sign_sqrt = %d", flipped_sign_sqrt);
-  printf("flipped_sign_sqrt_i = %d", flipped_sign_sqrt_i);
+  printf("correct_sign_sqrt = %d\n", correct_sign_sqrt);
+  printf("flipped_sign_sqrt = %d\n", flipped_sign_sqrt);
+  printf("flipped_sign_sqrt_i = %d\n", flipped_sign_sqrt_i);
 
   curve25519_mul(r_prime, r, SQRT_M1);
   curve25519_swap_conditional(r, r_prime, flipped_sign_sqrt | flipped_sign_sqrt_i);
