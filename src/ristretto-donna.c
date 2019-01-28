@@ -124,11 +124,7 @@ uint8_t curve25519_sqrt_ratio_i(bignum25519 *out, const bignum25519 *u, const bi
  */
 uint8_t curve25519_invsqrt(bignum25519 *out, bignum25519 *v)
 {
-  bignum25519 won;
-
-  curve25519_copy(won, one);
-
-  return curve25519_sqrt_ratio_i(out, &won, v);
+  return curve25519_sqrt_ratio_i(out, &one, v);
 }
 
 /**
