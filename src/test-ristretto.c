@@ -59,21 +59,21 @@ int test_curve25519_expand_random_field_element()
 
 int test_invsqrt_random_field_element()
 {
-  bignum25519 check, a, a_invsqrt;
+  bignum25519 check, v, v_invsqrt;
   uint8_t result;
 
-  // Use a = decode(ASQ_BYTES) so it's guaranteed to be square
+  // Use v = decode(ASQ_BYTES) so it's guaranteed to be square
 
-  curve25519_expand(a, ASQ_BYTES);
-  result = curve25519_invsqrt(&a_invsqrt, &a);
+  curve25519_expand(v, ASQ_BYTES);
+  result = curve25519_invsqrt(&v_invsqrt, &v);
 
   PRINT(("invsqrt random field element: "));
   if (result == 1) {
-    // expect a_invsqrt = sqrt(1/a)
-    // check = 1/a
-    curve25519_square(check, a_invsqrt);
+    // expect v_invsqrt = sqrt(1/v)
+    // check = 1/v
+    curve25519_square(check, v_invsqrt);
     // check = 1
-    curve25519_mul(check, check, a);
+    curve25519_mul(check, check, v);
     // assert check == 1
     if (bignum25519_ct_eq(check, one) == 1) {
       PRINT(("OKAY invsqrt computed correctly with tweak=1"));
@@ -83,11 +83,11 @@ int test_invsqrt_random_field_element()
       return 0;
     }
   } else if (result == 0) {
-    // expect a_invsqrt = sqrt(i/a)
-    // check = i/a
-    curve25519_square(check, a_invsqrt);
+    // expect v_invsqrt = sqrt(i/v)
+    // check = i/v
+    curve25519_square(check, v_invsqrt);
     // check = i
-    curve25519_mul(check, check, a);
+    curve25519_mul(check, check, v);
     // assert check == i
     if (bignum25519_ct_eq(check, SQRT_M1) == 1) {
       PRINT(("OKAY invsqrt computed correctly with tweak=i"));
