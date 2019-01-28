@@ -60,6 +60,8 @@ uint8_t bignum25519_ct_eq(const bignum25519 a, const bignum25519 b)
 
   curve25519_contract(c, a);
   curve25519_contract(d, b);
+  printf("c = %ul %ul %ul %ul\n", ((uint64_t*)c)[0], ((uint64_t*)c)[1], ((uint64_t*)c)[2], ((uint64_t*)c)[3]);
+  printf("d = %ul %ul %ul %ul\n", ((uint64_t*)d)[0], ((uint64_t*)d)[1], ((uint64_t*)d)[2], ((uint64_t*)d)[3]);
 
   return uint8_32_ct_eq(c, d);
 }
