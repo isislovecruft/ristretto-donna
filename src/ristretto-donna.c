@@ -83,6 +83,10 @@ uint8_t curve25519_sqrt_ratio_i(bignum25519 *out, const bignum25519 *u, const bi
   uint8_t flipped_sign_sqrt;
   uint8_t flipped_sign_sqrt_i;
 
+  printf("sqrt_ratio_i with u,v = \n");
+  fe_print(u);
+  fe_print(v);
+
   curve25519_square(tmp, *v);      // v²
   curve25519_mul(v3, tmp, *v);     // v³
   curve25519_square(tmp, v3);      // v⁶
@@ -93,6 +97,11 @@ uint8_t curve25519_sqrt_ratio_i(bignum25519 *out, const bignum25519 *u, const bi
   curve25519_mul(r, r, v3);        // (u)*(u*v^7)^{(p-5)/8}
   curve25519_square(tmp, r);       // tmp = r^2
   curve25519_mul(check, *v, tmp);  // check = r^2 * v
+
+  printf("r = \n");
+  fe_print(r);
+  printf("check = \n");
+  fe_print(check);
   
   curve25519_neg(u_neg, *u);
   curve25519_mul(u_neg_i, u_neg, SQRT_M1);

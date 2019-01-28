@@ -64,10 +64,11 @@ int test_invsqrt_random_field_element()
 
   // Use v = decode(ASQ_BYTES) so it's guaranteed to be square
 
-  curve25519_expand(v, ASQ_BYTES);
+  //curve25519_expand(v, ASQ_BYTES);
+  curve25519_copy(v, one);
   result = curve25519_invsqrt(&v_invsqrt, &v);
 
-  PRINT(("invsqrt random field element: "));
+  PRINT(("invsqrt test: "));
   if (result == 1) {
     // expect v_invsqrt = sqrt(1/v)
     // check = 1/v
