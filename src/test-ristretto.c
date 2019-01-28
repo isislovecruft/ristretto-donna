@@ -45,6 +45,18 @@ const uint8_t AP58_BYTES[32] = {
   0x15, 0x21, 0xf9, 0xe3, 0xe1, 0x61, 0x21, 0x55
 };
 
+int test_curve25519_expand_random_field_element()
+{
+  bignum25519 a;
+
+  curve25519_expand(a, A_BYTES);
+
+  printf("a=");
+  fe_print(&a);
+
+  return 1;
+}
+
 int test_invsqrt_random_field_element()
 {
   bignum25519 a, a_inv;
