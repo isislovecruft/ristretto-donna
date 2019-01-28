@@ -84,6 +84,23 @@ int test_invsqrt_random_field_element()
   return (int)result;
 }
 
+int test_ristretto_decode_random_point()
+{
+  ristretto_point_t point;
+  uint8_t result;
+
+  result = ristretto_decode(&point, A_BYTES);
+
+  printf("decoding random point: ");
+  if (result != 1) {
+    printf("FAIL result=%d\n", result);
+  } else {
+    printf("OKAY");
+  }
+
+  return (int)result;
+}
+
 int test_ristretto_decode_basepoint()
 {
   ristretto_point_t point;
@@ -91,8 +108,11 @@ int test_ristretto_decode_basepoint()
 
   result = ristretto_decode(&point, RISTRETTO_BASEPOINT_COMPRESSED);
 
+  printf("decoding basepoint: ");
   if (result != 1) {
-    printf("could not decode basepoint\n");
+    printf("FAIL result=%d\n", result);
+  } else {
+    printf("OKAY");
   }
 
   return (int)result;
@@ -100,12 +120,13 @@ int test_ristretto_decode_basepoint()
 
 int test_ristretto_encode_basepoint()
 {
-  ristretto_point_t point;
+  ristretto_point_t *point;
   unsigned char bytes[32];
   uint8_t result = 1;
 
-  ristretto_decode(&point, RISTRETTO_BASEPOINT_COMPRESSED);
-  ristretto_encode(bytes, &point);
+
+  ristretto_decode(point, RISTRETTO_BASEPOINT_COMPRESSED);
+  ristretto_encode(bytes, point);
 
   for (unsigned char i=0; i<32; i++) {
     if (bytes[i] != RISTRETTO_BASEPOINT_COMPRESSED[i]) {
@@ -135,9 +156,12 @@ int main(int argc, char **argv)
 {
   int result;
 
-  result  = test_ristretto_decode_basepoint();
+  result  = test_invsqrt_random_field_element();
+  result &= test_ristretto_decode_random_point();
+  result &= test_ristretto_decode_basepoint();
   result &= test_ristretto_encode_basepoint();
   result &= test_ristretto_ct_eq();
+  result &= test_curve25519_expand_random_field_element();
 
   return result;
 }
