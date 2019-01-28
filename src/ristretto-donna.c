@@ -75,24 +75,14 @@ static uint8_t bignum25519_is_negative(unsigned char bytes[32])
   return bytes[0] & 1;
 }
 
-/**
- * Calculate either `sqrt(1/v)` for a field element `v`.
- *
- * Returns:
- *  - 1 and stores `+sqrt(1/v)` in `out` if `v` was a non-zero square,
- *  - 0 and stores `0` in `out` if `v` was zero,
- *  - 0 and stores `+sqrt(i/v)` in `out` if `v` was a non-zero non-square.
- */
-STATIC uint8_t curve25519_invsqrt(bignum25519 *out, bignum25519 *v)
+uint8_t curve25519_sqrt_ratio_i(bignum25519 *out, const bignum25519 *u, const bignum25519 *v)
 {
-  bignum25519 tmp, v3, v7, r, r_prime, r_negative, check, i;
+  bignum25519 tmp, v3, v7, r, r_prime, r_negative, check, i, u_neg, u_neg_i;
   unsigned char r_bytes[32];
   uint8_t r_is_negative;
   uint8_t correct_sign_sqrt;
   uint8_t flipped_sign_sqrt;
   uint8_t flipped_sign_sqrt_i;
-
-  PRINT(("in invsqrt"));
 
   curve25519_square(tmp, *v);      // v²
   curve25519_mul(v3, tmp, *v);     // v³
@@ -102,11 +92,14 @@ STATIC uint8_t curve25519_invsqrt(bignum25519 *out, bignum25519 *v)
   curve25519_pow_two252m3(r, tmp); // v^{2^252+18}
   curve25519_square(tmp, r);       // v^{2^252+19}
   curve25519_mul(check, *v, tmp);
-  curve25519_neg(i, SQRT_M1);      // -sqrt(-1)
+  curve25519_neg(i, SQRT_M1);      // i = -sqrt(-1)
   
-  correct_sign_sqrt = bignum25519_ct_eq(check, one);
-  flipped_sign_sqrt = bignum25519_ct_eq(check, negative_one);
-  flipped_sign_sqrt_i = bignum25519_ct_eq(check, i);
+  curve25519_neg(u_neg, *u);
+  curve25519_mul(u_neg_i, *u, i);
+
+  correct_sign_sqrt = bignum25519_ct_eq(check, *u);
+  flipped_sign_sqrt = bignum25519_ct_eq(check, u_neg);
+  flipped_sign_sqrt_i = bignum25519_ct_eq(check, u_neg_i);
 
   curve25519_mul(r_prime, r, SQRT_M1);
   curve25519_swap_conditional(r, r_prime, flipped_sign_sqrt | flipped_sign_sqrt_i);
@@ -119,6 +112,23 @@ STATIC uint8_t curve25519_invsqrt(bignum25519 *out, bignum25519 *v)
   curve25519_swap_conditional(r, r_negative, r_is_negative);
 
   return correct_sign_sqrt | flipped_sign_sqrt;
+}
+
+/**
+ * Calculate either `sqrt(1/v)` for a field element `v`.
+ *
+ * Returns:
+ *  - 1 and stores `+sqrt(1/v)` in `out` if `v` was a non-zero square,
+ *  - 0 and stores `0` in `out` if `v` was zero,
+ *  - 0 and stores `+sqrt(i/v)` in `out` if `v` was a non-zero non-square.
+ */
+uint8_t curve25519_invsqrt(bignum25519 *out, bignum25519 *v)
+{
+  bignum25519 won;
+
+  curve25519_copy(won, one);
+
+  return curve25519_sqrt_ratio_i(out, &won, v);
 }
 
 /**
