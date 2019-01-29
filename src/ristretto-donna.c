@@ -22,7 +22,7 @@ static uint8_t bignum25519_is_negative(unsigned char bytes[32]);
  */
 static uint8_t uchar_ct_eq(const unsigned char a, const unsigned char b)
 {
-  unsigned char x = !(a ^ b);
+  unsigned char x = ~(a ^ b);
 
   x &= x >> 4;
   x &= x >> 2;
