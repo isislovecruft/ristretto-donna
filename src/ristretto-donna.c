@@ -13,7 +13,6 @@
 #include "ristretto-donna.h"
 
 static uint8_t uchar_ct_eq(const uint8_t a, const uint8_t b);
-static uint8_t uint8_32_ct_eq(const unsigned char a[32], const unsigned char b[32]);
 static uint8_t bignum25519_is_negative(unsigned char bytes[32]);
 
 /**
@@ -37,7 +36,7 @@ static uint8_t uchar_ct_eq(const unsigned char a, const unsigned char b)
  *
  * Returns 1 iff the bytes are equals and 0 otherwise.
  */
-static uint8_t uint8_32_ct_eq(const unsigned char a[32], const unsigned char b[32])
+uint8_t uint8_32_ct_eq(const unsigned char a[32], const unsigned char b[32])
 {
   unsigned char x = 1;
 

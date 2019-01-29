@@ -115,7 +115,7 @@ int test_ristretto_decode_random_point()
   if (result != 1) {
     printf("FAIL result=%d\n", result);
   } else {
-    printf("OKAY");
+    printf("OKAY\n");
   }
 
   return (int)result;
@@ -132,7 +132,7 @@ int test_ristretto_decode_basepoint()
   if (result != 1) {
     printf("FAIL result=%d\n", result);
   } else {
-    printf("OKAY");
+    printf("OKAY\n");
   }
 
   return (int)result;
@@ -159,6 +159,37 @@ int test_ristretto_encode_basepoint()
   return (int)result;
 }
 
+int test_uint8_32_ct_eq()
+{
+  uint8_t zero[32] = { 0, 0, 0, 0, 0, 0, 0, 0,
+                       0, 0, 0, 0, 0, 0, 0, 0,
+                       0, 0, 0, 0, 0, 0, 0, 0,
+                       0, 0, 0, 0, 0, 0, 0, 0, };
+  uint8_t one[32] = { 1, 0, 0, 0, 0, 0, 0, 0,
+                      0, 0, 0, 0, 0, 0, 0, 0,
+                      0, 0, 0, 0, 0, 0, 0, 0,
+                      0, 0, 0, 0, 0, 0, 0, 0, };
+  int ret = 1;
+
+  printf("test 32 byte array equality (0==0): ");
+  if (uint8_32_ct_eq(zero, zero) != 1) {
+    printf("FAIL\n");
+    ret = 0;
+  } else {
+    printf("OK\n");
+  }
+
+  printf("test 32 byte array equality (0==1): ");
+  if (uint8_32_ct_eq(zero, one) != 0) {
+    printf("FAIL\n");
+    ret = 0;
+  } else {
+    printf("OK\n");
+  }
+
+  return ret;
+}
+
 int test_ristretto_ct_eq()
 {
   ristretto_point_t *a, *b;
@@ -177,6 +208,7 @@ int main(int argc, char **argv)
   int result;
 
   result  = test_invsqrt_random_field_element();
+  result &= test_uint8_32_ct_eq();
   result &= test_ristretto_decode_random_point();
   result &= test_ristretto_decode_basepoint();
   result &= test_ristretto_encode_basepoint();
