@@ -162,8 +162,6 @@ int ristretto_decode(ristretto_point_t *element, const unsigned char bytes[32])
   uint8_t y_is_zero;
   uint8_t ok;
 
-  PRINT(("step 1"));
-
   // Step 1: Check that the encoding of the field element is canonical
   curve25519_expand(s, bytes);
   curve25519_contract(s_bytes_check, s);
@@ -175,8 +173,6 @@ int ristretto_decode(ristretto_point_t *element, const unsigned char bytes[32])
   if (s_encoding_is_canonical == 0 || s_is_negative == 1) {
       return 0;
   }
-
-  PRINT(("step 2"));
 
   // Step 2: Compute (X:Y:Z:T)
   // XXX can we eliminate these reductions
@@ -192,8 +188,6 @@ int ristretto_decode(ristretto_point_t *element, const unsigned char bytes[32])
 
   ok = curve25519_invsqrt(i, tmp);       // i = 1/sqrt{(ad(1+as²)² - (1-as²)²)(1-as²)²}
 
-  PRINT(("step 3"));
-
   // Step 3: Calculate x and y denominators, then compute x.
   curve25519_mul(dx, i, u2);             // 1/sqrt(v)
   curve25519_mul(tmp, dx, v);            // v/sqrt(v)
@@ -202,15 +196,11 @@ int ristretto_decode(ristretto_point_t *element, const unsigned char bytes[32])
   curve25519_mul(x, tmp, dx);            // x = |2s/sqrt(v)| = +sqrt(4s²/(ad(1+as²)² - (1-as²)²))
   curve25519_contract(x_bytes, x);
   
-  PRINT(("step 4"));
-
   // Step 4: Conditionally negate x if it's negative.
   x_is_negative = bignum25519_is_negative(x_bytes);
 
   curve25519_neg(tmp, x);
   curve25519_swap_conditional(x, tmp, x_is_negative);
-
-  PRINT(("step 5"));
 
   // Step 5: Compute y = (1-as²)/(1+as²) and t = {(1+as²)sqrt(4s²/(ad(1+as²)²-(1-as²)²))}/(1-as²)
   curve25519_mul(y, u1, dy);
@@ -222,8 +212,6 @@ int ristretto_decode(ristretto_point_t *element, const unsigned char bytes[32])
   if (ok == 0 || t_is_negative == 1 || y_is_zero == 1) {
     return 0;
   }
-
-  PRINT(("step 6"));
 
   curve25519_copy(element->point.x, x);
   curve25519_copy(element->point.y, y);
