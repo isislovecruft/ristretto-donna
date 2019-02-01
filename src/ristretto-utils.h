@@ -15,11 +15,11 @@ extern "C" {
 #endif
 
 #ifdef DEBUGGING
-#define PRINT(x)                                         \
-  printf(x);                                             \
+#define PRINT(x, ...)                                    \
+  printf(x, ##__VA_ARGS__);                              \
   printf("\n");
 #else
-#define PRINT(x) do {} while (0)
+#define PRINT(x, ...) do {} while (0)
 #endif
 
 #ifdef __GNUC__
@@ -45,12 +45,12 @@ void fe_print(const bignum25519 fe);
 void fe_print(const bignum25519 fe)
 {
 #ifdef ED25519_64BIT
-  printf("{%lu, %lu, %lu, %lu, %lu}\n",
-         fe[0], fe[1], fe[2], fe[3], fe[4]);
+  PRINT("{%lu, %lu, %lu, %lu, %lu}",
+        fe[0], fe[1], fe[2], fe[3], fe[4]);
 #else
-  printf("{%lu, %lu, %lu, %lu, %lu, %lu, %lu, %lu, %lu, %lu}\n",
-         fe[0], fe[1], fe[2], fe[3], fe[4],
-         fe[5], fe[6], fe[7], fe[8], fe[9]);
+  PRINT("{%lu, %lu, %lu, %lu, %lu, %lu, %lu, %lu, %lu, %lu}",
+        fe[0], fe[1], fe[2], fe[3], fe[4],
+        fe[5], fe[6], fe[7], fe[8], fe[9]);
 #endif
 }
 
