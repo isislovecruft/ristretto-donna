@@ -73,7 +73,11 @@ uint8_t bignum25519_ct_eq(const bignum25519 a, const bignum25519 b)
  */
 static uint8_t bignum25519_is_negative(unsigned char bytes[32])
 {
-  return bytes[0] & 1;
+  uint8_t low_bit_is_set = bytes[0] & 1;
+
+  PRINT("low_bit_is_set = %d", low_bit_is_set);
+
+  return low_bit_is_set;
 }
 
 uint8_t curve25519_sqrt_ratio_i(bignum25519 out, const bignum25519 u, const bignum25519 v)
