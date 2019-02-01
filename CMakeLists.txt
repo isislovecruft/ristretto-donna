@@ -20,7 +20,7 @@ configure_file (
 include_directories("${PROJECT_BINARY_DIR}")
 
 set(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} -DEDD25519_TEST -DDEBUGGING")
-set(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE} -march=native -O3 -DEDD25519_TEST -DDEBUGGING -DRISTRETTO_DONNA_PRIVATE")
+set(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE} -march=native -O3 -DEDD25519_TEST")
 
 # Define the ristretto-donna library
 add_library(ristretto-donna SHARED src/ed25519.c src/ristretto-donna.c)
