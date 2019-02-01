@@ -39,8 +39,9 @@ static uint8_t uchar_ct_eq(const unsigned char a, const unsigned char b)
 uint8_t uint8_32_ct_eq(const unsigned char a[32], const unsigned char b[32])
 {
   unsigned char x = 1;
+  unsigned char i;
 
-  for (unsigned char i=0; i<32; i++) {
+  for (i=0; i<32; i++) {
     x &= uchar_ct_eq(a[i], b[i]);
   }
 
