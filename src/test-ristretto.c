@@ -62,16 +62,19 @@ void print_uchar32(unsigned char uchar[32])
 int test_curve25519_expand_random_field_element()
 {
   bignum25519 a;
+  unsigned char a_bytes[32]; // discard the const qualifier
   unsigned char b[32];
 
   printf("expanding and contracting random field element: ");
 
-  curve25519_expand(a, A_BYTES);
+  memcpy(a_bytes, A_BYTES, 32);
+
+  curve25519_expand(a, a_bytes);
   curve25519_contract(b, a);
 
   if (!uint8_32_ct_eq(A_BYTES, b)) {
     printf("FAIL\n");
-    PRINT("a="); print_uchar32(A_BYTES);
+    PRINT("a="); print_uchar32(a_bytes);
     PRINT("b="); print_uchar32(b);
     return 0;
   } else {
