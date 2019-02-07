@@ -212,13 +212,14 @@ int test_ristretto_encode_basepoint()
 {
   ristretto_point_t *point;
   unsigned char bytes[32];
+  unsigned char i;
   uint8_t result = 1;
 
 
   ristretto_decode(point, RISTRETTO_BASEPOINT_COMPRESSED);
   ristretto_encode(bytes, point);
 
-  for (unsigned char i=0; i<32; i++) {
+  for (i=0; i<32; i++) {
     if (bytes[i] != RISTRETTO_BASEPOINT_COMPRESSED[i]) {
       printf("byte %d did not match: original=%u encoded=%u\n",
              i, RISTRETTO_BASEPOINT_COMPRESSED[i], bytes[i]);
