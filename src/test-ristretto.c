@@ -213,14 +213,13 @@ int test_ristretto_decode_basepoint()
 
 int test_ristretto_encode_basepoint()
 {
-  ristretto_point_t *point;
+  ristretto_point_t point;
   unsigned char bytes[32];
   unsigned char i;
   uint8_t result = 1;
 
-
-  ristretto_decode(point, RISTRETTO_BASEPOINT_COMPRESSED);
-  ristretto_encode(bytes, point);
+  ristretto_decode(&point, RISTRETTO_BASEPOINT_COMPRESSED);
+  ristretto_encode(bytes, &point);
 
   for (i=0; i<32; i++) {
     if (bytes[i] != RISTRETTO_BASEPOINT_COMPRESSED[i]) {
@@ -266,13 +265,13 @@ int test_uint8_32_ct_eq()
 
 int test_ristretto_ct_eq()
 {
-  ristretto_point_t *a, *b;
+  ristretto_point_t a, b;
   int result;
 
-  ristretto_decode(a, RISTRETTO_BASEPOINT_COMPRESSED);
-  ristretto_decode(b, RISTRETTO_BASEPOINT_COMPRESSED);
+  ristretto_decode(&a, RISTRETTO_BASEPOINT_COMPRESSED);
+  ristretto_decode(&b, RISTRETTO_BASEPOINT_COMPRESSED);
 
-  result = ristretto_ct_eq(a, b);
+  result = ristretto_ct_eq(&a, &b);
 
   return result;
 }
