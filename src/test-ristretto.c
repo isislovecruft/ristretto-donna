@@ -137,7 +137,7 @@ int test_invsqrt_random_field_element()
   curve25519_copy(v, one);
   result = curve25519_invsqrt(v_invsqrt, v);
 
-  PRINT(("invsqrt test: "));
+  printf("invsqrt test: ");
   if (result == 1) {
     // expect v_invsqrt = sqrt(1/v)
     // check = 1/v
@@ -146,10 +146,11 @@ int test_invsqrt_random_field_element()
     curve25519_mul(check, check, v);
     // assert check == 1
     if (bignum25519_ct_eq(check, one) == 1) {
-      PRINT(("OKAY invsqrt computed correctly with tweak=1"));
+      printf("OKAY invsqrt computed correctly with tweak=1\n");
       return 1;
     } else {
-      PRINT(("FAIL invsqrt not computed correctly with tweak=1"));
+      printf("FAIL invsqrt not computed correctly with tweak=1\n");
+      PRINT("v_invsqrt = "); fe_print(v_invsqrt);
       return 0;
     }
   } else if (result == 0) {
@@ -160,14 +161,14 @@ int test_invsqrt_random_field_element()
     curve25519_mul(check, check, v);
     // assert check == i
     if (bignum25519_ct_eq(check, SQRT_M1) == 1) {
-      PRINT(("OKAY invsqrt computed correctly with tweak=i"));
+      printf("OKAY invsqrt computed correctly with tweak=i\n");
       return 1;
     } else {
-      PRINT(("FAIL invsqrt not computed correctly with tweak=i"));
+      printf("FAIL invsqrt not computed correctly with tweak=i\n");
       return 0;
     }
   } else {
-    PRINT(("FAIL invsqrt did not return 0 or 1"));
+    printf("FAIL invsqrt did not return 0 or 1\n");
     return 0;
   }
 
