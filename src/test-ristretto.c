@@ -45,16 +45,85 @@ const uint8_t AP58_BYTES[32] = {
   0x15, 0x21, 0xf9, 0xe3, 0xe1, 0x61, 0x21, 0x55
 };
 
+void print_uchar32(unsigned char uchar[32])
+{
+  unsigned char i;
+
+  for (i=0; i<32; i++) {
+#ifdef DEBUGGING
+    printf("%02x, ", uchar[i]);
+#endif
+  }
+#ifdef DEBUGGING
+  printf("\n");
+#endif
+}
+
 int test_curve25519_expand_random_field_element()
 {
   bignum25519 a;
+  unsigned char b[32];
+
+  printf("expanding and contracting random field element: ");
 
   curve25519_expand(a, A_BYTES);
+  curve25519_contract(b, a);
 
-  printf("a=");
-  fe_print(a);
+  if (!uint8_32_ct_eq(A_BYTES, b)) {
+    printf("FAIL\n");
+    PRINT("a="); print_uchar32(A_BYTES);
+    PRINT("b="); print_uchar32(b);
+    return 0;
+  } else {
+    printf("OK\n");
+    return 1;
+  }
+}
 
-  return 1;
+int test_curve25519_expand_basepoint()
+{
+  bignum25519 a;
+  unsigned char b[32];
+
+  printf("expanding and contracting basepoint: ");
+
+  curve25519_expand(a, RISTRETTO_BASEPOINT_COMPRESSED);
+  curve25519_contract(b, a);
+
+  if (!uint8_32_ct_eq(RISTRETTO_BASEPOINT_COMPRESSED, b)) {
+    printf("FAIL\n");
+    PRINT("a="); print_uchar32(RISTRETTO_BASEPOINT_COMPRESSED);
+    PRINT("b="); print_uchar32(b);
+    return 0;
+  } else {
+    printf("OK\n");
+    return 1;
+  }
+}
+
+int test_curve25519_expand_identity()
+{
+  bignum25519 a;
+  unsigned char b[32];
+  unsigned char identity[32] = {0, 0, 0, 0, 0, 0, 0, 0,
+                                0, 0, 0, 0, 0, 0, 0, 0,
+                                0, 0, 0, 0, 0, 0, 0, 0,
+                                0, 0, 0, 0, 0, 0, 0, 0};
+
+  printf("expanding and contracting identity: ");
+
+  curve25519_expand(a, identity);
+  curve25519_contract(b, a);
+
+  if (!uint8_32_ct_eq(identity, b)) {
+    printf("FAIL\n");
+    PRINT("a="); print_uchar32(identity);
+    PRINT("b="); print_uchar32(b);
+    return 0;
+  } else {
+    printf("OK\n");
+    return 1;
+  }
 }
 
 int test_invsqrt_random_field_element()
@@ -211,9 +280,11 @@ int main(int argc, char **argv)
   result &= test_uint8_32_ct_eq();
   result &= test_ristretto_decode_random_point();
   result &= test_ristretto_decode_basepoint();
+  result &= test_curve25519_expand_random_field_element();
+  result &= test_curve25519_expand_basepoint();
+  result &= test_curve25519_expand_identity();
   result &= test_ristretto_encode_basepoint();
   result &= test_ristretto_ct_eq();
-  result &= test_curve25519_expand_random_field_element();
 
   return result;
 }
