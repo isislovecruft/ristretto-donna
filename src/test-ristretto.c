@@ -121,7 +121,7 @@ int test_curve25519_expand_identity()
 
   if (!uint8_32_ct_eq(IDENTITY, b)) {
     printf("FAIL\n");
-    PRINT("a="); print_uchar32(IDENTITY);
+    PRINT("a="); print_uchar32((unsigned char*)IDENTITY);
     PRINT("b="); print_uchar32(b);
     return 0;
   } else {
@@ -219,7 +219,7 @@ int test_ristretto_encode_small_multiples_of_basepoint()
   ristretto_point_t P, B;
   unsigned char i;
   unsigned char encoded[32];
-  unsigned char* encodings_of_small_multiples[32] = {
+  unsigned char encodings_of_small_multiples[16][32] = {
     // This is the identity
     {0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
      0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00},
@@ -257,22 +257,22 @@ int test_ristretto_encode_small_multiples_of_basepoint()
      0xd9, 0x90, 0x21, 0xbb, 0x68, 0x1d, 0xfc, 0x33, 0x02, 0xa9, 0xd9, 0x9a, 0x2e, 0x53, 0xe6, 0x4e},
   };
 
-  printf("encoding small multiples of basepoint: ");
+  printf("encoding small multiples of basepoint:\n");
 
-  ge25519_expand(P, IDENTITY);
-  ge25519_expand(B, RISTRETTO_BASEPOINT_COMPRESSED);
+  ge25519_unpack_negative_vartime(&P.point, IDENTITY);
+  ge25519_unpack_negative_vartime(&B.point, RISTRETTO_BASEPOINT_COMPRESSED);
 
   for (i=0; i<16; i++) {
-    result &= ristretto_encode(encoded, P);
+    ristretto_encode(encoded, (const ristretto_point_t*)&P);
 
     if (!uint8_32_ct_eq(encoded, encodings_of_small_multiples[i])) {
-      printf("FAIL small multiple #%d failed to encode correctly:\n", i);
-      printf("original = ");
-      for j
+      printf("  - FAIL small multiple #%d failed to encode correctly\n", i);
+      PRINT("    original = ");
+      print_uchar32(encoded);
       result &= 0;
     }
 
-    ge25519_add(P, P, B); // add another multiple of the basepoint
+    ge25519_add(&P.point, &P.point, (const ge25519*)&B.point); // add another multiple of the basepoint
   }
 
   return (int)result;
