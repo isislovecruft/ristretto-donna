@@ -83,7 +83,7 @@ int test_curve25519_expand_random_field_element()
     PRINT("b="); print_uchar32(b);
     return 0;
   } else {
-    printf("OK\n");
+    printf("OKAY\n");
     return 1;
   }
 }
@@ -104,7 +104,7 @@ int test_curve25519_expand_basepoint()
     PRINT("b="); print_uchar32(b);
     return 0;
   } else {
-    printf("OK\n");
+    printf("OKAY\n");
     return 1;
   }
 }
@@ -114,7 +114,7 @@ int test_curve25519_expand_identity()
   bignum25519 a;
   unsigned char b[32];
 
-  printf("expanding and contracting identity: ");
+  printf("test expanding and contracting additive identity: ");
 
   curve25519_expand(a, IDENTITY);
   curve25519_contract(b, a);
@@ -288,12 +288,14 @@ int test_ristretto_encode_small_multiples_of_basepoint()
   ge25519_unpack_negative_vartime(&P.point, IDENTITY);
   ge25519_unpack_negative_vartime(&B.point, RISTRETTO_BASEPOINT_COMPRESSED);
 
-  for (i=0; i<16; i++) {
+  for (i=1; i<16; i++) {
     ristretto_encode(encoded, (const ristretto_point_t*)&P);
 
     if (!uint8_32_ct_eq(encoded, encodings_of_small_multiples[i])) {
       printf("  - FAIL small multiple #%d failed to encode correctly\n", i);
       PRINT("    original = ");
+      print_uchar32(encodings_of_small_multiples[i]);
+      PRINT("    encoded = ");
       print_uchar32(encoded);
       result &= 0;
     }
@@ -311,15 +313,23 @@ int test_ristretto_encode_basepoint()
   unsigned char i;
   uint8_t result = 1;
 
+  printf("test ristretto encode basepoint: ");
+
   ristretto_decode(&point, RISTRETTO_BASEPOINT_COMPRESSED);
   ristretto_encode(bytes, &point);
 
   for (i=0; i<32; i++) {
     if (bytes[i] != RISTRETTO_BASEPOINT_COMPRESSED[i]) {
-      printf("byte %d did not match: original=%u encoded=%u\n",
-             i, RISTRETTO_BASEPOINT_COMPRESSED[i], bytes[i]);
+      PRINT("byte %d did not match: original=%u encoded=%u",
+            i, RISTRETTO_BASEPOINT_COMPRESSED[i], bytes[i]);
       result = 0;
     }
+  }
+
+  if (result != 1) {
+    printf("FAIL\n");
+  } else {
+    printf("OKAY\n");
   }
 
   return (int)result;
@@ -342,7 +352,7 @@ int test_uint8_32_ct_eq()
     printf("FAIL\n");
     ret = 0;
   } else {
-    printf("OK\n");
+    printf("OKAY\n");
   }
 
   printf("test 32 byte array equality (0==1): ");
@@ -350,7 +360,7 @@ int test_uint8_32_ct_eq()
     printf("FAIL\n");
     ret = 0;
   } else {
-    printf("OK\n");
+    printf("OKAY\n");
   }
 
   return ret;
@@ -361,10 +371,18 @@ int test_ristretto_ct_eq()
   ristretto_point_t a, b;
   int result;
 
+  printf("test ristretto constant time equality check: ");
+
   ristretto_decode(&a, RISTRETTO_BASEPOINT_COMPRESSED);
   ristretto_decode(&b, RISTRETTO_BASEPOINT_COMPRESSED);
 
   result = ristretto_ct_eq(&a, &b);
+
+  if (result != 1) {
+    printf("FAIL\n");
+  } else {
+    printf("OKAY\n");
+  }
 
   return result;
 }
