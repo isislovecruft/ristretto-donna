@@ -13,20 +13,22 @@ configure_file (
   )
 
 # Add the src/ directory
-add_subdirectory(src)
+#add_subdirectory(src)
 
 # add the binary tree to the search path for include files
 # so that we will find ristretto-donna-config.h
 include_directories("${PROJECT_BINARY_DIR}")
 
-set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -march=native -O3 -DEDD25519_TEST")
+set(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} -DEDD25519_TEST -DDEBUGGING")
+set(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE} -march=native -O3 -DEDD25519_TEST")
 
-# add the executable
-add_executable(ristretto-donna
-  src/ed25519.c
-  src/test.c
-)
+# Define the ristretto-donna library
+add_library(ristretto-donna SHARED src/ed25519.c src/ristretto-donna.c)
+
+# Define the test binary
+add_executable(ristretto-donna-test src/test-ristretto.c)
+target_link_libraries(ristretto-donna-test ristretto-donna)
 
 # Link in OpenSSL
-target_link_libraries(ristretto-donna -lssl)
-target_link_libraries(ristretto-donna -lcrypto)
+target_link_libraries(ristretto-donna-test -lssl)
+target_link_libraries(ristretto-donna-test -lcrypto)

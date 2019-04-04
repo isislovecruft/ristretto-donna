@@ -1,6 +1,8 @@
-set(src_SOURCES
+set(ristretto_donna_SOURCES
   ed25519.c
   ristretto-donna.c
-  test.c
-  test-internals.c
-  )
+)
+
+set(test_SOURCES
+  test-ristretto.c
+)
