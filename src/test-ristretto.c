@@ -178,21 +178,22 @@ int test_invsqrt_random_field_element()
 
 }
 
-int test_ristretto_decode_random_point()
+int test_ristretto_decode_random_invalid_point()
 {
   ristretto_point_t point;
   uint8_t result;
 
+  // This field element doesn't represent a valid point…
   result = ristretto_decode(&point, A_BYTES);
 
-  printf("decoding random point: ");
-  if (result != 1) {
+  printf("decoding random invalid point: ");
+  if (result != 0) { // …and thus we want the decoding to fail.
     printf("FAIL result=%d\n", result);
+    return 1;
   } else {
     printf("OKAY\n");
+    return 0;
   }
-
-  return (int)result;
 }
 
 int test_ristretto_decode_basepoint()
@@ -283,7 +284,7 @@ int main(int argc, char **argv)
 
   result  = test_invsqrt_random_field_element();
   result &= test_uint8_32_ct_eq();
-  result &= test_ristretto_decode_random_point();
+  result &= test_ristretto_decode_random_invalid_point();
   result &= test_ristretto_decode_basepoint();
   result &= test_curve25519_expand_random_field_element();
   result &= test_curve25519_expand_basepoint();
