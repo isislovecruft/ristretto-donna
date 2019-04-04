@@ -306,6 +306,35 @@ int test_ristretto_encode_small_multiples_of_basepoint()
   return (int)result;
 }
 
+int test_ristretto_encode_identity()
+{
+  ristretto_point_t point;
+  unsigned char bytes[32];
+  unsigned char i;
+  uint8_t result = 1;
+
+  printf("test ristretto encode identity: ");
+
+  ristretto_decode(&point, IDENTITY);
+  ristretto_encode(bytes, &point);
+
+  for (i=0; i<32; i++) {
+    if (bytes[i] != IDENTITY[i]) {
+      PRINT("byte %d did not match: original=%u encoded=%u",
+            i, IDENTITY[i], bytes[i]);
+      result = 0;
+    }
+  }
+
+  if (result != 1) {
+    printf("FAIL\n");
+  } else {
+    printf("OKAY\n");
+  }
+
+  return (int)result;
+}
+
 int test_ristretto_encode_basepoint()
 {
   ristretto_point_t point;
@@ -399,6 +428,7 @@ int main(int argc, char **argv)
   result &= test_curve25519_expand_basepoint();
   result &= test_curve25519_expand_identity();
   result &= test_ge25519_unpack_pack();
+  result &= test_ristretto_encode_identity();
   result &= test_ristretto_encode_basepoint();
   result &= test_ristretto_encode_small_multiples_of_basepoint();
   result &= test_ristretto_ct_eq();
