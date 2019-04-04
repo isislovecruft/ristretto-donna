@@ -45,6 +45,11 @@ const uint8_t AP58_BYTES[32] = {
   0x15, 0x21, 0xf9, 0xe3, 0xe1, 0x61, 0x21, 0x55
 };
 
+const unsigned char IDENTITY[32] = {0, 0, 0, 0, 0, 0, 0, 0,
+                                    0, 0, 0, 0, 0, 0, 0, 0,
+                                    0, 0, 0, 0, 0, 0, 0, 0,
+                                    0, 0, 0, 0, 0, 0, 0, 0};
+
 void print_uchar32(unsigned char uchar[32])
 {
   unsigned char i;
@@ -108,19 +113,15 @@ int test_curve25519_expand_identity()
 {
   bignum25519 a;
   unsigned char b[32];
-  unsigned char identity[32] = {0, 0, 0, 0, 0, 0, 0, 0,
-                                0, 0, 0, 0, 0, 0, 0, 0,
-                                0, 0, 0, 0, 0, 0, 0, 0,
-                                0, 0, 0, 0, 0, 0, 0, 0};
 
   printf("expanding and contracting identity: ");
 
-  curve25519_expand(a, identity);
+  curve25519_expand(a, IDENTITY);
   curve25519_contract(b, a);
 
-  if (!uint8_32_ct_eq(identity, b)) {
+  if (!uint8_32_ct_eq(IDENTITY, b)) {
     printf("FAIL\n");
-    PRINT("a="); print_uchar32(identity);
+    PRINT("a="); print_uchar32(IDENTITY);
     PRINT("b="); print_uchar32(b);
     return 0;
   } else {
