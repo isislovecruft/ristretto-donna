@@ -32,6 +32,22 @@ static uint8_t uchar_ct_eq(const unsigned char a, const unsigned char b)
 }
 
 /**
+ * Compress a group element into a 32-byte buffer.
+ *
+ * This function is exactly the same as `ge25519_pack()`, except that
+ * it does not optionally XOR in a parity bit at the end if the
+ * x-coordinate was negative.
+ **/
+void ge25519_pack_without_parity(unsigned char bytes[32], const ge25519 *p) {
+	bignum25519 tx, ty, zi;
+
+	curve25519_recip(zi, p->z);
+	curve25519_mul(tx, p->x, zi);
+	curve25519_mul(ty, p->y, zi);
+	curve25519_contract(bytes, ty);
+}
+
+/**
  * Check if two 32 bytes arrays are equal in constant time.
  *
  * Returns 1 iff the bytes are equals and 0 otherwise.

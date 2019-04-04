@@ -101,6 +101,7 @@ int ristretto_ct_eq(const ristretto_point_t *a, const ristretto_point_t *b);
 uint8_t curve25519_invsqrt(bignum25519 out, const bignum25519 v);
 uint8_t uint8_32_ct_eq(const unsigned char a[32], const unsigned char b[32]);
 uint8_t bignum25519_ct_eq(const bignum25519 a, const bignum25519 b);
+void ge25519_pack_without_parity(unsigned char bytes[32], const ge25519 *p);
 #endif // RISTRETTO_DONNA_PRIVATE
 
 #if defined(__cplusplus)

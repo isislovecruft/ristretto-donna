@@ -125,9 +125,35 @@ int test_curve25519_expand_identity()
     PRINT("b="); print_uchar32(b);
     return 0;
   } else {
-    printf("OK\n");
+    printf("OKAY\n");
     return 1;
   }
+}
+
+int test_ge25519_unpack_pack()
+{
+  ge25519 a;
+  unsigned char b[32];
+  int result;
+
+  printf("test unpacking and packing a group element: ");
+
+  result = ge25519_unpack_negative_vartime(&a, IDENTITY);
+  ge25519_pack_without_parity(b, &a);
+
+  if (!uint8_32_ct_eq(b, IDENTITY)) {
+    result &= 0;
+  }
+
+  if (result != 1) {
+    printf("FAIL\n");
+    PRINT("a="); print_uchar32((unsigned char*)IDENTITY);
+    PRINT("b="); print_uchar32(b);
+  } else {
+    printf("OKAY\n");
+  }
+
+  return result;
 }
 
 int test_invsqrt_random_field_element()
@@ -354,6 +380,7 @@ int main(int argc, char **argv)
   result &= test_curve25519_expand_random_field_element();
   result &= test_curve25519_expand_basepoint();
   result &= test_curve25519_expand_identity();
+  result &= test_ge25519_unpack_pack();
   result &= test_ristretto_encode_basepoint();
   result &= test_ristretto_encode_small_multiples_of_basepoint();
   result &= test_ristretto_ct_eq();
