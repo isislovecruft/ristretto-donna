@@ -285,8 +285,8 @@ int test_ristretto_encode_small_multiples_of_basepoint()
 
   printf("encoding small multiples of basepoint: ");
 
-  ristretto_decode(&P.point, IDENTITY);
-  ristretto_decode(&B.point, RISTRETTO_BASEPOINT_COMPRESSED);
+  ristretto_decode(&P, IDENTITY);
+  ristretto_decode(&B, RISTRETTO_BASEPOINT_COMPRESSED);
 
   for (i=0; i<16; i++) {
     ristretto_encode(encoded, (const ristretto_point_t*)&P);
