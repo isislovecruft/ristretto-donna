@@ -215,10 +215,10 @@ int test_ristretto_decode_random_invalid_point()
   printf("decoding random invalid point: ");
   if (result != 0) { // …and thus we want the decoding to fail.
     printf("FAIL result=%d\n", result);
-    return 1;
+    return 0;
   } else {
     printf("OKAY\n");
-    return 0;
+    return 1;
   }
 }
 
@@ -438,6 +438,12 @@ int main(int argc, char **argv)
   result &= test_ristretto_encode_basepoint();
   result &= test_ristretto_encode_small_multiples_of_basepoint();
   result &= test_ristretto_ct_eq();
+
+  if (0 == result) {
+    printf("SOME TESTS FAILED TO PASS\n");
+  } else {
+    printf("ALL TESTS PASSED OKAY\n");
+  }
 
   return result;
 }
