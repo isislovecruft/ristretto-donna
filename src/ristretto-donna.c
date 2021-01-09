@@ -246,7 +246,7 @@ int ristretto_decode(ristretto_point_t *element, const unsigned char bytes[32])
 
 void ristretto_encode(unsigned char bytes[32], const ristretto_point_t *element)
 {
-  bignum25519 u1, u2, i1, i2, z_inv, den_inv, ix, iy, invsqrt, tmp1, tmp2;
+  bignum25519 u1, u2, u22, i1, i2, z_inv, den_inv, ix, iy, invsqrt, tmp1, tmp2;
   bignum25519 x, y, y_neg, s, s_neg;
   bignum25519 enchanted_denominator;
   unsigned char contracted[32];
@@ -259,7 +259,8 @@ void ristretto_encode(unsigned char bytes[32], const ristretto_point_t *element)
   curve25519_mul(u1, tmp1, tmp2);
   curve25519_mul(u2, element->point.x, element->point.y);
 
-  curve25519_mul(tmp1, u1, u2);
+  curve25519_square(u22, u2);
+  curve25519_mul(tmp1, u1, u22);
 
   // This is always square so we don't need to check the return value
   curve25519_invsqrt(invsqrt, tmp1);
@@ -287,7 +288,7 @@ void ristretto_encode(unsigned char bytes[32], const ristretto_point_t *element)
   // Next we torque the points to be non-negative
 
   // Conditionally flip the sign of y to be positive
-  curve25519_mul(tmp1, element->point.x, z_inv);
+  curve25519_mul(tmp1, x, z_inv);
   curve25519_contract(contracted, tmp1);
 
   x_zinv_is_negative = bignum25519_is_negative(contracted);
@@ -295,7 +296,7 @@ void ristretto_encode(unsigned char bytes[32], const ristretto_point_t *element)
   curve25519_neg(y_neg, y);
   curve25519_swap_conditional(y, y_neg, x_zinv_is_negative);
 
-  curve25519_sub_reduce(tmp1, element->point.z, element->point.y);
+  curve25519_sub_reduce(tmp1, element->point.z, y);
   curve25519_mul(s, i2, tmp1);
   curve25519_contract(contracted, s);
 

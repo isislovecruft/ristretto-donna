@@ -283,12 +283,12 @@ int test_ristretto_encode_small_multiples_of_basepoint()
      0xd9, 0x90, 0x21, 0xbb, 0x68, 0x1d, 0xfc, 0x33, 0x02, 0xa9, 0xd9, 0x9a, 0x2e, 0x53, 0xe6, 0x4e},
   };
 
-  printf("encoding small multiples of basepoint:\n");
+  printf("encoding small multiples of basepoint: ");
 
-  ge25519_unpack_negative_vartime(&P.point, IDENTITY);
-  ge25519_unpack_negative_vartime(&B.point, RISTRETTO_BASEPOINT_COMPRESSED);
+  ristretto_decode(&P.point, IDENTITY);
+  ristretto_decode(&B.point, RISTRETTO_BASEPOINT_COMPRESSED);
 
-  for (i=1; i<16; i++) {
+  for (i=0; i<16; i++) {
     ristretto_encode(encoded, (const ristretto_point_t*)&P);
 
     if (!uint8_32_ct_eq(encoded, encodings_of_small_multiples[i])) {
@@ -301,6 +301,12 @@ int test_ristretto_encode_small_multiples_of_basepoint()
     }
 
     ge25519_add(&P.point, &P.point, (const ge25519*)&B.point); // add another multiple of the basepoint
+  }
+
+  if (result != 1) {
+    printf("FAIL\n");
+  } else {
+    printf("OKAY\n");
   }
 
   return (int)result;
