@@ -314,13 +314,34 @@ void ristretto_encode(unsigned char bytes[32], const ristretto_point_t *element)
 }
 
 /**
- * Produce a Ristretto group element from a 512-bit hash digest.
- *
- * Returns 1 on success, otherwise returns 0.
+ * The Ristretto-flavoured Elligator2 encoding.
  */
-int ristretto_from_uniform_bytes(ristretto_point_t *element, const unsigned char bytes[64])
+static void ristretto_flavor_elligator2(ristretto_point_t *element, const bignum25519 r_0)
 {
-  return 1;
+  // XXX TODO need elligator2 ristretto flavour
+}
+
+/**
+ * Produce a Ristretto group element from a 512-bit hash digest.
+ */
+void ristretto_from_uniform_bytes(ristretto_point_t *element, const unsigned char bytes[64])
+{
+  bignum25519 r1, r2;
+  ristretto_point_t R1, R2, R;
+  ge25519 P;
+
+  curve25519_expand(r1, bytes);
+  curve25519_expand(r2, bytes+32);
+
+  ristretto_flavor_elligator2(&R1, r1);
+  ristretto_flavor_elligator2(&R2, r2);
+
+  ge25519_add(&P, &R1.point, &R2.point);
+
+  curve25519_copy(element->point.x, P.x);
+  curve25519_copy(element->point.y, P.y);
+  curve25519_copy(element->point.z, P.z);
+  curve25519_copy(element->point.t, P.t);
 }
 
 /**
