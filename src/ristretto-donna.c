@@ -244,6 +244,9 @@ int ristretto_decode(ristretto_point_t *element, const unsigned char bytes[32])
   return 1;
 }
 
+/**
+ * Encode a ristretto element to an array of 32 bytes.
+ */
 void ristretto_encode(unsigned char bytes[32], const ristretto_point_t *element)
 {
   bignum25519 u1, u2, u22, i1, i2, z_inv, den_inv, ix, iy, invsqrt, tmp1, tmp2;
@@ -254,50 +257,50 @@ void ristretto_encode(unsigned char bytes[32], const ristretto_point_t *element)
   uint8_t s_is_negative;
   uint8_t rotate;
 
-  curve25519_add_reduce(tmp1, element->point.z, element->point.y);
-  curve25519_sub_reduce(tmp2, element->point.z, element->point.y);
-  curve25519_mul(u1, tmp1, tmp2);
-  curve25519_mul(u2, element->point.x, element->point.y);
+  curve25519_add_reduce(tmp1, element->point.z, element->point.y); // t1 = z+y
+  curve25519_sub_reduce(tmp2, element->point.z, element->point.y); // t2 = z-y
+  curve25519_mul(u1, tmp1, tmp2);                                  // u1 = z²-y²
+  curve25519_mul(u2, element->point.x, element->point.y);          // u2 = xy
 
-  curve25519_square(u22, u2);
-  curve25519_mul(tmp1, u1, u22);
+  curve25519_square(u22, u2);                                      // u22 = x²y²
+  curve25519_mul(tmp1, u1, u22);                                   // t1  = x²y²(z²-y²)
 
   // This is always square so we don't need to check the return value
-  curve25519_invsqrt(invsqrt, tmp1);
+  curve25519_invsqrt(invsqrt, tmp1);                               // invsqrt = sqrt(1/(x²y²(z²-y²)))
 
-  curve25519_mul(i1, invsqrt, u1);
-  curve25519_mul(i2, invsqrt, u2);
+  curve25519_mul(i1, invsqrt, u1);                                 // den1 = (z²-y²)/sqrt(x²y²(z²-y²))
+  curve25519_mul(i2, invsqrt, u2);                                 // den2 = xy/sqrt(x²y²(z²-y²))
   curve25519_mul(tmp1, i2, element->point.t);
-  curve25519_mul(z_inv, tmp1, i1);
-  curve25519_mul(ix, element->point.x, SQRT_M1);
-  curve25519_mul(iy, element->point.y, SQRT_M1);
-  curve25519_mul(enchanted_denominator, i1, INVSQRT_A_MINUS_D);
-  curve25519_mul(tmp1, element->point.t, z_inv);
+  curve25519_mul(z_inv, tmp1, i1);                                 // z_inv = (xyt)(z²-y²)/2sqrt(x²y²(z²-y²))
+  curve25519_mul(ix, element->point.x, SQRT_M1);                   // ix = x*sqrt(-1)
+  curve25519_mul(iy, element->point.y, SQRT_M1);                   // iy = y*sqrt(-1)
+  curve25519_mul(enchanted_denominator, i1, INVSQRT_A_MINUS_D);    // enchanted = sqrt(1/(-1-d))(z²-y²)/sqrt(x²y²(z²-y²))
+  curve25519_mul(tmp1, element->point.t, z_inv);                   // t1 = (xyt²)(z²-y²)/2sqrt(x²y²(z²-y²))
   curve25519_contract(contracted, tmp1);
 
-  rotate = bignum25519_is_negative(contracted);
-
+  rotate = bignum25519_is_negative(contracted);                    // rotate = { 1 iff LSB in t1 is set
+                                                                   //          { 0 iff LSB in t1 is unset
   curve25519_copy(x, element->point.x);
   curve25519_copy(y, element->point.y);
 
   // Rotate into the distinguished Jacobi quartic quadrant
-  curve25519_swap_conditional(x, iy, rotate);
-  curve25519_swap_conditional(y, ix, rotate);
-  curve25519_swap_conditional(i2, enchanted_denominator, rotate);
+  curve25519_swap_conditional(x, iy, rotate);                      // set x to a square (i*x), if it wasn't
+  curve25519_swap_conditional(y, ix, rotate);                      // set y to a square, if it wasn't
+  curve25519_swap_conditional(i2, enchanted_denominator, rotate);  // den2 = enchanted, if t1 was negative
 
   // Next we torque the points to be non-negative
 
   // Conditionally flip the sign of y to be positive
-  curve25519_mul(tmp1, x, z_inv);
+  curve25519_mul(tmp1, x, z_inv);                                  // t1 = x/z
   curve25519_contract(contracted, tmp1);
 
   x_zinv_is_negative = bignum25519_is_negative(contracted);
 
-  curve25519_neg(y_neg, y);
-  curve25519_swap_conditional(y, y_neg, x_zinv_is_negative);
+  curve25519_neg(y_neg, y);                                        // y = { -y iff x/z is negative
+  curve25519_swap_conditional(y, y_neg, x_zinv_is_negative);       //     {  y otherwise
 
-  curve25519_sub_reduce(tmp1, element->point.z, y);
-  curve25519_mul(s, i2, tmp1);
+  curve25519_sub_reduce(tmp1, element->point.z, y);                // t1 = z - y
+  curve25519_mul(s, i2, tmp1);                                     // s = den2 * (z-y)
   curve25519_contract(contracted, s);
 
   // Conditionally flip the sign of s to be positive
