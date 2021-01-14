@@ -83,6 +83,57 @@ const bignum25519 INVSQRT_A_MINUS_D = {
 #endif
 
 /**
+ * `= sqrt(a*d - 1)`, where `a = -1 (mod p)`, `d` are the Edwards curve parameters.
+ */
+#if defined(ED25519_64BIT)
+const bignum25519 SQRT_AD_MINUS_ONE = {
+  2241493124984347,
+  425987919032274,
+  2207028919301688,
+  1220490630685848,
+  974799131293748,
+};
+#else
+const bignum25519 SQRT_AD_MINUS_ONE = {
+    24849947, 33400850, 43495378, 6347714, 46036536, 32887293, 41837720, 18186727, 66238516, 14525638,
+};
+#endif
+
+/**
+ * Edwards `d` value minus one squared, equal to `(((-121665/121666) mod p) - 1) pow 2`
+ */
+#if defined(ED25519_64BIT)
+const bignum25519 EDWARDS_D_MINUS_ONE_SQUARED = {
+  1507062230895904,
+  1572317787530805,
+  683053064812840,
+  317374165784489,
+  1572899562415810
+};
+#else
+const bignum25519 EDWARDS_D_MINUS_ONE_SQUARED = {
+    15551776, 22456977, 53683765, 23429360, 55212328, 10178283, 40474537, 4729243, 61826754, 23438029
+};
+#endif
+
+/**
+ * One minus edwards `d` value squared, equal to `(1 - (-121665/121666) mod p) pow 2`
+ */
+#if defined(ED25519_64BIT)
+const bignum25519 ONE_MINUS_EDWARDS_D_SQUARED = {
+  1136626929484150,
+  1998550399581263,
+  496427632559748,
+  118527312129759,
+  45110755273534
+};
+#else
+const bignum25519 ONE_MINUS_EDWARDS_D_SQUARED = {
+    6275446, 16937061, 44170319, 29780721, 11667076, 7397348, 39186143, 1766194, 42675006, 672202
+};
+#endif
+
+/**
  * The Ristretto basepoint in compressed form.
  */
 static unsigned char RISTRETTO_BASEPOINT_COMPRESSED[32] = {
@@ -102,6 +153,7 @@ uint8_t curve25519_invsqrt(bignum25519 out, const bignum25519 v);
 uint8_t uint8_32_ct_eq(const unsigned char a[32], const unsigned char b[32]);
 uint8_t bignum25519_ct_eq(const bignum25519 a, const bignum25519 b);
 void ge25519_pack_without_parity(unsigned char bytes[32], const ge25519 *p);
+void ristretto_flavor_elligator2(ristretto_point_t *element, const bignum25519 r_0);
 #endif // RISTRETTO_DONNA_PRIVATE
 
 #if defined(__cplusplus)

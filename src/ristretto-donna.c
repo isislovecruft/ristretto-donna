@@ -94,6 +94,15 @@ static uint8_t bignum25519_is_negative(unsigned char bytes[32])
   return low_bit_is_set;
 }
 
+/**
+ * Calculate either `sqrt(u/v)` for field elements `u` and `v`.
+ *
+ * Returns:
+ *  - 1 and stores `+sqrt(1/v)` in `out` if `v` was a non-zero square,
+ *  - 1 and stores `0` in `out` if `u` was zero,
+ *  - 0 and stores `0` in `out` if `v` was zero and `u` was non-square,
+ *  - 0 and stores `+sqrt(i/v)` in `out` if `v` was a non-zero non-square.
+ */
 uint8_t curve25519_sqrt_ratio_i(bignum25519 out, const bignum25519 u, const bignum25519 v)
 {
   bignum25519 tmp, v3, v7, r, r_prime, r_negative, check, i, u_neg, u_neg_i;
@@ -316,9 +325,52 @@ void ristretto_encode(unsigned char bytes[32], const ristretto_point_t *element)
 /**
  * The Ristretto-flavoured Elligator2 encoding.
  */
-static void ristretto_flavor_elligator2(ristretto_point_t *element, const bignum25519 r_0)
+void ristretto_flavor_elligator2(ristretto_point_t *element, const bignum25519 r_0)
 {
-  // XXX TODO need elligator2 ristretto flavour
+  bignum25519 tmp1, tmp2, tmp3, r, N_s, D, c, s, s_prime, s_prime_neg, s_square, s2;
+  bignum25519 x, z, y, t;
+  ge25519_p1p1 P;
+  uint8_t was_square, was_positive;
+  unsigned char contracted[32];
+
+  curve25519_copy(c, negative_one);                              // c = -1
+
+  curve25519_mul(tmp1, r_0, r_0);                                // r_0²
+  curve25519_mul(r, tmp1, SQRT_M1);                              // r = -r_0²
+  curve25519_add(tmp1, r, one);                                  // t1 = -r_0²+1
+  curve25519_mul(N_s, tmp1, ONE_MINUS_EDWARDS_D_SQUARED);        // N_s = (-r_0²+1)(1-d)²
+
+  curve25519_add(tmp1, r, EDWARDS_D);                            // -r_0²+d
+  curve25519_mul(tmp2, r, EDWARDS_D);                            // (-r_0²)d
+  curve25519_sub(tmp3, negative_one, tmp2);                      // 1-(-r_0²)d
+  curve25519_mul(D, tmp3, tmp1);                                 // D = (1-(-r_0²)d)(-r_0²+d)
+
+  was_square = curve25519_sqrt_ratio_i(s, N_s, D);
+
+  curve25519_mul(s_prime, s, r_0);
+
+  curve25519_contract(contracted, s_prime);
+  was_positive = !bignum25519_is_negative(contracted);
+
+  curve25519_neg(s_prime_neg, s_prime);
+  curve25519_swap_conditional(s_prime, s_prime_neg, was_positive);
+  curve25519_swap_conditional(s, s_prime, !was_square);
+  curve25519_swap_conditional(c, r, !was_square);
+
+  curve25519_sub(tmp1, r, one);
+  curve25519_mul(tmp2, c, tmp1);
+  curve25519_mul(tmp1, tmp2, EDWARDS_D_MINUS_ONE_SQUARED);
+  curve25519_sub(tmp2, tmp1, D);
+
+  curve25519_mul(s_square, s, s);
+  curve25519_add(s2, s, s);
+
+  curve25519_mul(P.x, s2, D);
+  curve25519_mul(P.z, tmp2, SQRT_AD_MINUS_ONE);
+  curve25519_sub(P.y, one, s_square);
+  curve25519_add(P.t, one, s_square);
+
+  ge25519_p1p1_to_full(&element->point, &P); // P1xP1 to extended twisted edwards coordinates
 }
 
 /**
