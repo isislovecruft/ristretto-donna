@@ -314,16 +314,6 @@ void ristretto_encode(unsigned char bytes[32], const ristretto_point_t *element)
 }
 
 /**
- * Produce a Ristretto group element from a 512-bit hash digest.
- *
- * Returns 1 on success, otherwise returns 0.
- */
-int ristretto_from_uniform_bytes(ristretto_point_t *element, const unsigned char bytes[64])
-{
-  return 1;
-}
-
-/**
  * Test equality of two `ristretto_point_t`s in constant time.
  *
  * Returns 1 if the two points are equal, and 0 otherwise.
