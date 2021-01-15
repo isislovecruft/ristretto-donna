@@ -102,6 +102,15 @@ const unsigned char RISTRETTO_BASEPOINT_COMPRESSED[32] = {
  */
 const ristretto_point_t RISTRETTO_BASEPOINT_POINT = {ge25519_basepoint};
 
+typedef struct ristretto_basepoint_table_s {
+  ge25519_neils table[32];
+} ristretto_basepoint_table_t;
+
+/**
+ * The Ristretto basepoint table for faster scalar multiplication.
+ */
+const ristretto_basepoint_table_t ALIGN(16) RISTRETTO_BASEPOINT_TABLE = {ge25519_niels_sliding_multiples};
+
 int ristretto_decode(ristretto_point_t *element, const unsigned char bytes[32]);
 void ristretto_encode(unsigned char bytes[32], const ristretto_point_t *element);
 int ristretto_ct_eq(const ristretto_point_t *a, const ristretto_point_t *b);
