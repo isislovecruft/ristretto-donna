@@ -9,6 +9,11 @@
 #define RISTRETTO_DONNA_H
 
 #include "ed25519-donna.h"
+#if defined(ED25519_64BIT)
+#include "ed25519-donna-64bit-tables.h"
+#else
+#include "ed25519-donna-32bit-tables.h"
+#endif
 #include "ristretto-utils.h"
 
 #if defined(__cplusplus)
@@ -85,12 +90,17 @@ const bignum25519 INVSQRT_A_MINUS_D = {
 /**
  * The Ristretto basepoint in compressed form.
  */
-static unsigned char RISTRETTO_BASEPOINT_COMPRESSED[32] = {
+const unsigned char RISTRETTO_BASEPOINT_COMPRESSED[32] = {
     0xe2, 0xf2, 0xae, 0x0a, 0x6a, 0xbc, 0x4e, 0x71,
     0xa8, 0x84, 0xa9, 0x61, 0xc5, 0x00, 0x51, 0x5f,
     0x58, 0xe3, 0x0b, 0x6a, 0xa5, 0x82, 0xdd, 0x8d,
     0xb6, 0xa6, 0x59, 0x45, 0xe0, 0x8d, 0x2d, 0x76,
 };
+
+/**
+ * The Ristretto basepoint.
+ */
+const ristretto_point_t RISTRETTO_BASEPOINT_POINT = {ge25519_basepoint};
 
 int ristretto_decode(ristretto_point_t *element, const unsigned char bytes[32]);
 void ristretto_encode(unsigned char bytes[32], const ristretto_point_t *element);
